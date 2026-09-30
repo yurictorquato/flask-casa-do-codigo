@@ -9,6 +9,7 @@ class Config:
     )
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
     APP = None
+    SQLALCHEMY_DATABASE_URI = "postgresql://postgres:admin123@127.0.0.1:5432/livro_flask"
 
 
 class DevelopmentConfig(Config):
@@ -31,7 +32,7 @@ class ProductionConfig(Config):
     TESTING = False
     DEBUG = False
     IP_HOST = "localhost"  # aqui geralmente é um IP de um servidor na nuvem e não o endereço da máquina local
-    PORT_HOST = 8000
+    PORT_HOST = 8080
     URL_MAIN = f"http://{IP_HOST}:{PORT_HOST}/"
 
 
