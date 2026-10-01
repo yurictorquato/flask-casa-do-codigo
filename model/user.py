@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
-from model.Role import Role
 
 from config import app_active, app_config
+from model.role import Role
 
 config = app_config[app_active]
 
@@ -14,10 +14,10 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
     date_created = db.Column(
-        db.Datetime(6), default=db.func.current_timestamp(), nullable=False
+        db.DateTime(6), default=db.func.current_timestamp(), nullable=False
     )
     last_update = db.Column(
-        db.Datetime(6), default=db.func.current_timestamp(), nullable=False
+        db.DateTime(6), default=db.func.current_timestamp(), nullable=False
     )
     recovery_code = db.Column(db.String(200), nullable=True)
     active = db.Column(db.Boolean(), default=1, nullable=True)

@@ -9,7 +9,7 @@ class Config:
     )
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
     APP = None
-    SQLALCHEMY_DATABASE_URI = "postgresql://postgres:admin123@127.0.0.1:5432/livro_flask"
+    SQLALCHEMY_DATABASE_URI = "postgresql://postgres:admin123@127.0.0.1:5433/livro_flask"
 
 
 class DevelopmentConfig(Config):
