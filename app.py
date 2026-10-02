@@ -1,11 +1,11 @@
-from flask import Flask, request
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, redirect, render_template, request
 
+from admin.admin import start_views
 from config import app_active, app_config
+from controller.user import UserController
+from extension import db
 
 config = app_config[app_active]
-
-db = SQLAlchemy()
 
 
 def create_app(config_name):
@@ -17,6 +17,8 @@ def create_app(config_name):
     app.config["SQLALCHEMY_DATABASE_URI"] = config.SQLALCHEMY_DATABASE_URI
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+    start_views(app, db)
+
     db.init_app(app)
 
     @app.route("/")
@@ -27,35 +29,49 @@ def create_app(config_name):
     def login():
         return "Aqui entrará a tela de login."
 
+    @app.route("/login/", methods=["POST"])
+    def login_post():
+        user = UserController()
+
+        email = request.form["email"]
+        password = request.form["password"]
+
+        result = user.login(email, password)
+
+        if result:
+            return redirect("/admin")
+        else:
+            return render_template(
+                "login.html",
+                data={
+                    "status": 401,
+                    "msg": "Dados de usuário incorretos",
+                    "type": None,
+                },
+            )
+
     @app.route("/recovery-password/")
     def recovery_password():
         return "Aqui entrará a tela de recuperar a senha."
 
-    @app.route("/profile/<int:id>/action/<action>/")
-    def profile(id, action):
-        if action == "action1":
-            return f"Ação {action} do usuário de ID {id}"
-        elif action == "action2":
-            return f"Ação {action} do usuário de ID {id}"
-        elif action == "action3":
-            return f"Ação {action} do usuário de ID {id}"
+    @app.route("/recovery-password/", methods=["POST"])
+    def send_recovery_password():
+        user = UserController()
 
-    @app.route("/profile", methods=["POST", "GET"])
-    def create_profile():
-        # if request.method == "POST":
-        #     return "Método POST sendo requisitado"
-        # elif request.method == "GET":
-        #     return "Método GET sendo requisitado"
-        username = request.form["username"]
-        password = request.form["password"]
+        result = user.recovery(request.form["email"])
 
-        return f"Essa rota possui um método POST e criará um usuário com os dados de usuário {username} e senha {password}"
-
-    @app.route("/profile/<int:id>", methods=["PUT"])
-    def edit_total_profile(id):
-        username = request.form["username"]
-        password = request.form["password"]
-
-        return f"Essa rota possui um método PUT e editirá o nome do usuário para {username} e a senha para {password}"
+        if result:
+            return render_template(
+                "recovery.html",
+                data={
+                    "status": 200,
+                    "msg": "E-mail de recuperação enviado com sucesso",
+                },
+            )
+        else:
+            return render_template(
+                "recovery.html",
+                data={"status": 401, "msg": "Erro ao enviar e-mail de recuperação"},
+            )
 
     return app

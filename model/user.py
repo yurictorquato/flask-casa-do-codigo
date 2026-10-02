@@ -1,12 +1,8 @@
-from flask_sqlalchemy import SQLAlchemy
 from passlib.hash import pbkdf2_sha256
+from sqlalchemy.orm import relationship
 
-from config import app_active, app_config
+from extension import db
 from model.role import Role
-
-config = app_config[app_active]
-
-db = SQLAlchemy(config.APP)
 
 
 class User(db.Model):
@@ -23,6 +19,8 @@ class User(db.Model):
     recovery_code = db.Column(db.String(200), nullable=True)
     active = db.Column(db.Boolean(), default=1, nullable=True)
     role = db.Column(db.Integer, db.ForeignKey(Role.id), nullable=False)
+
+    funcao = relationship(Role)
 
     def get_user_by_email(self): ...
 
@@ -44,3 +42,6 @@ class User(db.Model):
             return pbkdf2_sha256.verify(password_no_hash, password_database)
         except ValueError:
             return False
+
+    def __repr__(self) -> str:
+        return f"{self.id} - {self.username}"
